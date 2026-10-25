@@ -1,0 +1,31 @@
+ExtendedTests evidence (Java 17, no external libraries).
+Run ExtendedTests.main() in IntelliJ, with the project root as working directory.
+Compilation from the project root:
+javac --release 17 -encoding UTF-8 -d build src/Java/Algorithms.java src/Java/Input.java src/Java/Json.java src/Java/Main.java tests/ExtendedTests.java
+java -cp build ExtendedTests
+
+Thirty handcrafted fixtures are repeated twice through one Main.main() invocation.
+extended.inputs.jsonl, extended.expected.jsonl and extended.actual.jsonl have 60 aligned lines.
+extended.case_names.json identifies those lines in execution order.
+Expected answers are independently calculated; witnesses are checked semantically.
+DSU expectations count merges and component sizes directly.
+Special forests use -4+3+1000000000=999999999 and three components, including an isolate.
+Positive and negative four-edge chains have costs +/-4000000000.
+SCC expected groups are {0,1},{2,3},{4},{5}; condensation has only the two forward links.
+Topological constraints are checked edge by edge; self-loops and disconnected cycles are rejected.
+DAG distances follow explicit path sums; source 1 tests incoming edges and unreachable predecessors.
+The source-unreachable cycle must still make the complete DAG request cyclic.
+Equivalent forest edge sets, SCC labels, topological orders and DAG parents need not match exactly.
+Five witness demonstrations accept alternatives and reject duplicate IDs, duplicate condensation,
+invalid precedence and a parent edge ending at the wrong vertex.
+
+Each of six scale generators uses n=100000 and exactly 250000 operations/edges.
+DSU joins the chain, then self-unions: state[i]=[n-k,k+1], k=min(i+1,n-1).
+The negative chain is the unique MST: cost=-(n-1)*1000000000=-99999000000000, components=1.
+SCC has n singleton groups and exactly n-1 forward condensation pairs.
+The topological chain forces order [0,1,...,99999].
+DAG distance[v]=-v*1000000000; all parent edges must form paths to source 0.
+The generators are stored in ExtendedTests.java; large results are summarized in extended.scale.json.
+Every entry is validated before a scale case is marked as passed.
+Scale durations include conversion and validation and are not Kruskal-Prim benchmark timings.
+Only extended.summary.json with passed=true from a completed run records overall success.

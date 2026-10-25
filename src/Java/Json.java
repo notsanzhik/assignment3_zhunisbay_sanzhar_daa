@@ -4,11 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-/**
- * Provided JSON input/output for the assignment's integer-valued requests.
- * Use this parser as supplied; you do not need to implement or modify it.
- * Use Input.java to obtain numbers and arrays in Algorithms.java.
- */
 final class Json {
     private final String text;
     private int position;
@@ -61,20 +56,24 @@ final class Json {
         }
 
         int start = position;
+
         if (current == '-') {
             position++;
         }
+
         while (position < text.length()
                 && Character.isDigit(text.charAt(position))) {
             position++;
         }
+
         return Long.parseLong(text.substring(start, position));
     }
 
     private Map<String, Object> readObject() {
-        position++; // Opening brace.
+        position++;
         Map<String, Object> result = new LinkedHashMap<>();
         skipWhitespace();
+
         if (text.charAt(position) == '}') {
             position++;
             return result;
@@ -83,22 +82,26 @@ final class Json {
         while (true) {
             String key = readString();
             skipWhitespace();
-            position++; // Colon.
+            position++;
+
             result.put(key, readValue());
             skipWhitespace();
 
             char separator = text.charAt(position++);
+
             if (separator == '}') {
                 return result;
             }
-            skipWhitespace(); // After the comma.
+
+            skipWhitespace();
         }
     }
 
     private List<Object> readArray() {
-        position++; // Opening bracket.
+        position++;
         List<Object> result = new ArrayList<>();
         skipWhitespace();
+
         if (text.charAt(position) == ']') {
             position++;
             return result;
@@ -107,7 +110,9 @@ final class Json {
         while (true) {
             result.add(readValue());
             skipWhitespace();
+
             char separator = text.charAt(position++);
+
             if (separator == ']') {
                 return result;
             }
@@ -116,16 +121,20 @@ final class Json {
 
     private String readString() {
         skipWhitespace();
-        position++; // Opening quote.
+        position++;
+
         StringBuilder result = new StringBuilder();
 
         while (true) {
             char current = text.charAt(position++);
+
             if (current == '"') {
                 return result.toString();
             }
+
             if (current == '\\') {
                 current = text.charAt(position++);
+
                 switch (current) {
                     case 'n':
                         current = '\n';
@@ -148,10 +157,10 @@ final class Json {
                         position += 4;
                         break;
                     default:
-                        // Escaped quote, backslash or slash.
                         break;
                 }
             }
+
             result.append(current);
         }
     }
@@ -160,32 +169,42 @@ final class Json {
         if (value == null) {
             return "null";
         }
+
         if (value instanceof String) {
             return writeString((String) value);
         }
+
         if (value instanceof Map) {
             StringJoiner fields = new StringJoiner(",", "{", "}");
+
             for (Map.Entry<?, ?> entry : ((Map<?, ?>) value).entrySet()) {
                 fields.add(writeString(entry.getKey().toString())
                         + ":" + write(entry.getValue()));
             }
+
             return fields.toString();
         }
+
         if (value instanceof Iterable) {
             StringJoiner elements = new StringJoiner(",", "[", "]");
+
             for (Object element : (Iterable<?>) value) {
                 elements.add(write(element));
             }
+
             return elements.toString();
         }
+
         if (value.getClass().isArray()) {
             return writeArray(value);
         }
+
         return value.toString();
     }
 
     private static String writeString(String value) {
         StringBuilder result = new StringBuilder("\"");
+
         for (char current : value.toCharArray()) {
             if (current == '"' || current == '\\') {
                 result.append('\\').append(current);
@@ -195,16 +214,18 @@ final class Json {
                 result.append(current);
             }
         }
+
         return result.append('"').toString();
     }
 
     private static String writeArray(Object value) {
-        // Internal transport detail: handles primitive and nested Java arrays.
         StringJoiner elements = new StringJoiner(",", "[", "]");
         int length = java.lang.reflect.Array.getLength(value);
+
         for (int i = 0; i < length; i++) {
             elements.add(write(java.lang.reflect.Array.get(value, i)));
         }
+
         return elements.toString();
     }
 }
